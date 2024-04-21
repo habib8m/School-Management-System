@@ -1,0 +1,15 @@
+
+var total;
+p_due = parseFloat($v("P47_PREVIOUS_DUE"), 10)? parseFloat($v("P47_PREVIOUS_DUE"), 10) : 0;
+p_paid = parseFloat($v("P47_PAID"), 10) ? parseFloat($v("P47_PAID"), 10) : 0;
+
+if (p_due==null) {
+    p_due=0;
+}
+if (p_paid==null) {
+    p_paid=0;
+    }
+
+total=Math.round(p_due - p_paid);
+
+$s("P47_REMAINING_DUE", parseFloat(total, 10));

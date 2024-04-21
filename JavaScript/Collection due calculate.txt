@@ -1,0 +1,17 @@
+
+--Student collection page deu calculate--
+
+var total;
+payable = parseFloat($v("P43_PAYABLE"), 10)? parseFloat($v("P43_PAYABLE"), 10) : 0;
+paid = parseFloat($v("P43_PAID"), 10) ? parseFloat($v("P43_PAID"), 10) : 0;
+
+if (payable==null) {
+    payable=0;
+}
+if (paid==null) {
+    paid=0;
+    }
+
+total=Math.round(payable - paid);
+
+$s("P43_DUE", parseFloat(total, 10));

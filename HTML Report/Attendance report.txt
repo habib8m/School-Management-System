@@ -1,0 +1,101 @@
+
+DECLARE
+   CURSOR attendance_cursor IS
+      SELECT
+         ROWNUM AS SL,
+         CL.CLASS_NAME,
+         SEC.SECTION_NAME,
+         M.ATTENDANCE_DATE,
+         S.STUDENT_ID,
+         S.FIRST_NAME || ' ' || S.LAST_NAME AS Student_name,
+         CASE WHEN D.STATUS = 'P' THEN 'success' WHEN D.STATUS = 'A' THEN 'warning' END AS STATUS_COLOR,
+         CASE WHEN D.STATUS = 'P' THEN 'Present' WHEN D.STATUS = 'A' THEN 'Absent' END AS Status,
+         LISTAGG(D.DESCRIPTION, ', ') WITHIN GROUP (ORDER BY D.DESCRIPTION) AS Descriptions
+      FROM
+         STU_AT_MASTER M
+         JOIN STU_AT_DETAIL D ON M.MASTER_AT_ID = D.MASTER_AT_ID
+         JOIN STUDENTS S ON S.STUDENT_ID = D.STUDENT_ID
+         JOIN CLASS CL ON CL.CLASS_ID = M.CLASS_ID
+         JOIN SECTIONS SEC ON SEC.SECTION_ID = M.SECTION_ID
+      WHERE
+         M.CLASS_ID = NVL(:P57_CLASS_ID, M.CLASS_ID) 
+         AND M.SECTION_ID = NVL(:P57_SECTION_ID, M.SECTION_ID) 
+         AND TO_DATE(M.ATTENDANCE_DATE) = NVL(TO_DATE(:P57_ATTENDANCE_DATE, 'DD-MON-YY'), M.ATTENDANCE_DATE)
+      GROUP BY
+         ROWNUM,
+         CL.CLASS_NAME,
+         SEC.SECTION_NAME,
+         M.ATTENDANCE_DATE,
+         S.STUDENT_ID,
+         S.FIRST_NAME || ' ' || S.LAST_NAME,
+         CASE WHEN D.STATUS = 'P' THEN 'success' WHEN D.STATUS = 'A' THEN 'warning' END,
+         CASE WHEN D.STATUS = 'P' THEN 'Present' WHEN D.STATUS = 'A' THEN 'Absent' END;
+
+   v_class varchar2(50);
+   v_section varchar2(50);
+   v_atten_date date;
+
+BEGIN
+   htp.p('<html>');
+   htp.p('<head>');
+   htp.p('<style>');
+   htp.p('body { font-family: Arial, sans-serif; background-color: #f2f2f2; }');
+   htp.p('h1, h5, h3, h4 { color: #333; text-align: center; margin: 0; font-weight: bold; line-geight: 1; }');
+   htp.p('table { width: 80%; margin: 20px auto; border-collapse: collapse; }');
+   htp.p('th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }');
+   htp.p('th { background-color: #4CAF50; color: white; }');
+   htp.p('.success { color: green; }');
+   htp.p('.warning { color: red; }');
+   htp.p('</style>');
+   htp.p('</head>');
+
+   htp.p('<body>');
+   htp.p('<h1>Attendance Report</h1>');
+   htp.p('<h3>Ideal School and College</h3>');
+   htp.p('<h4>R.K Mission Road, Dhaka</h4>');
+   htp.p('<h4>+8801636987895</h4>');
+
+   SELECT
+         CL.CLASS_NAME,
+         SEC.SECTION_NAME,
+         M.ATTENDANCE_DATE 
+
+      INTO 
+         v_class,
+         v_section,
+         v_atten_date
+
+      FROM
+         CLASS CL, SECTIONS SEC, STU_AT_MASTER M 
+      WHERE CL.CLASS_ID = M.CLASS_ID
+      AND SEC.SECTION_ID = M.SECTION_ID
+      AND M.CLASS_ID = 6
+      AND M.SECTION_ID = 2
+      AND TO_DATE(M.ATTENDANCE_DATE) = TO_DATE('19-OCT-23', 'DD-MON-YY');
+
+   htp.p('<h4>' || v_class || ' (' || v_section || ')</h4>');
+   htp.p('<h4>Date: ' || TO_CHAR(v_atten_date, 'MM/DD/YYYY') || '</h4>');
+
+   htp.p('<table>');
+   htp.p('<tr>');
+   htp.p('<th>SL#</th>');
+   htp.p('<th>Student ID</th>');
+   htp.p('<th>Student Name</th>');
+   htp.p('<th>Status</th>');
+   htp.p('<th>Description</th>');
+   htp.p('</tr>');
+
+   FOR v_attendance_record IN attendance_cursor LOOP
+      htp.p('<tr>');
+      htp.p('<td>' || v_attendance_record.SL || '</td>');
+      htp.p('<td>' || v_attendance_record.STUDENT_ID || '</td>');
+      htp.p('<td>' || v_attendance_record.Student_name || '</td>');
+      htp.p('<td class="' || v_attendance_record.STATUS_COLOR || '">' || v_attendance_record.Status || '</td>');
+      htp.p('<td>' || v_attendance_record.Descriptions || '</td>');
+      htp.p('</tr>');
+   END LOOP;
+
+   htp.p('</table>');
+   htp.p('</body>');
+   htp.p('</html>');
+END;

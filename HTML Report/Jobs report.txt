@@ -1,0 +1,46 @@
+
+DECLARE
+   CURSOR jobs_cursor IS
+      SELECT job_title, min_sal , max_sal
+      FROM jobs;
+
+   v_job_record jobs_cursor%ROWTYPE;
+BEGIN
+   htp.p('<html>');
+   htp.p('<head>');
+   htp.p('<style>');
+   htp.p('body { font-family: Arial, sans-serif; background-color: #f2f2f2; }');
+   htp.p('h1, h5, h3 { color: #333; text-align: center; margin: 0; }'); -- Adjusted styles for h tags
+   htp.p('table { width: 60%; margin: 20px auto; border-collapse: collapse; }');
+   htp.p('th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }');
+   htp.p('th { background-color: #4CAF50; color: white; }');
+   htp.p('footer { text-align: center; }');
+   htp.p('</style>');
+   htp.p('</head>');
+
+   htp.p('<body>');
+   htp.p('<h1>Jobs Report</h1>');
+   htp.p('<h3>Ideal School and College</h3>');
+   htp.p('<h5>R.K Mission Road Dhaka<br>+8801636987895</h5>');
+   htp.p('<table>');
+   htp.p('<tr>');
+   htp.p('<th>Job Title</th>');
+   htp.p('<th>Min Salary</th>');
+   htp.p('<th>Max Salary</th>');
+   htp.p('</tr>');
+
+   FOR v_job_record IN jobs_cursor LOOP
+      htp.p('<tr>');
+      htp.p('<td>' || v_job_record.job_title || '</td>');
+      htp.p('<td>' || v_job_record.min_sal || '</td>');
+      htp.p('<td>' || v_job_record.max_sal || '</td>');
+      htp.p('</tr>');
+   END LOOP;
+
+   htp.p('</table>');
+   htp.p('<footer>'); -- Added footer section
+   htp.p('<p>Page 1 | ' || TO_CHAR(SYSDATE, 'DD-MON-YYYY HH24:MI:SS') || '</p>'); -- Display page number and date
+   htp.p('</footer>');
+   htp.p('</body>');
+   htp.p('</html>');
+END;

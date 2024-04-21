@@ -1,0 +1,11 @@
+
+var model = apex.region("ExpenseDetail").widget().interactiveGrid("getViews", "grid").model;
+var n_amt, n_totamt = 0;
+col_amt = model.getFieldKey("AMOUNT");
+model.forEach(function(igrow) {
+    n_amt = parseInt(igrow[col_amt], 10);
+    if (!isNaN(n_amt)) {
+        n_totamt += n_amt;
+    }
+});
+apex.item("P206_TOTAL_AMOUNT").setValue(n_totamt);

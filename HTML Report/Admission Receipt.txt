@@ -1,0 +1,98 @@
+
+DECLARE
+   v_student_id     admission.student_id%TYPE := :p_student_id; 
+   v_receipt_no     admission.admission_id%TYPE;
+   v_admission_date admission.admission_date%TYPE;
+   v_student_name   VARCHAR2(100);
+   v_class_name     class.class_name%TYPE;
+   v_section_name   sections.section_name%TYPE;
+   v_roll_no        admission.roll_no%TYPE;
+   v_admission_fees admission.admission_fees%TYPE;
+BEGIN
+   SELECT
+      a.admission_id,
+      a.admission_date,
+      a.student_id,
+      s.first_name || ' ' || s.last_name,
+      c.class_name,
+      sec.section_name,
+      a.roll_no,
+      a.admission_fees
+   INTO
+      v_receipt_no,
+      v_admission_date,
+      v_student_id,
+      v_student_name,
+      v_class_name,
+      v_section_name,
+      v_roll_no,
+      v_admission_fees
+   FROM
+      admission a
+      JOIN students s ON a.student_id = s.student_id
+      JOIN class c ON a.class_id = c.class_id
+      LEFT JOIN sections sec ON a.section_id = sec.section_id
+   WHERE
+      a.student_id = (select max(student_id) from admission);
+
+   htp.p('<html>');
+   htp.p('<head>');
+   htp.p('<style>');
+   htp.p('body { font-family: Arial, sans-serif; background-color: #f2f2f2; }');
+   htp.p('h1, h5, h3 { color: #333; text-align: center; margin: 0; }');
+   htp.p('table { width: 50%; margin: 20px auto; }');
+   htp.p('th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }');
+   htp.p('th { background-color: #ddd; color: #444; }');
+   htp.p('</style>');
+   htp.p('</head>');
+
+   htp.p('<body>');
+   htp.p('<h1>Admission Receipt</h1>');
+   htp.p('<h3>Ideal School and College</h3>');
+   htp.p('<h5>R.K Mission Road Dhaka<br>+8801636987895</h5>');
+
+   htp.p('<table>');
+   htp.p('<tr>');
+   htp.p('<th>Receipt No</th>');
+   htp.p('<td>' || v_receipt_no || '</td>');
+   htp.p('</tr>');
+
+   htp.p('<tr>');
+   htp.p('<th>Admission Date</th>');
+   htp.p('<td>' || TO_CHAR(v_admission_date, 'DD-MON-YYYY') || '</td>');
+   htp.p('</tr>');
+
+   htp.p('<tr>');
+   htp.p('<th>Student Id</th>');
+   htp.p('<td>' || v_student_id || '</td>');
+   htp.p('</tr>');
+
+   htp.p('<tr>');
+   htp.p('<th>Student Name</th>');
+   htp.p('<td>' || v_student_name || '</td>');
+   htp.p('</tr>');
+
+   htp.p('<tr>');
+   htp.p('<th>Class</th>');
+   htp.p('<td>' || v_class_name || '</td>');
+   htp.p('</tr>');
+
+   htp.p('<tr>');
+   htp.p('<th>Section</th>');
+   htp.p('<td>' || v_section_name || '</td>');
+   htp.p('</tr>');
+
+   htp.p('<tr>');
+   htp.p('<th>Roll No</th>');
+   htp.p('<td>' || v_roll_no || '</td>');
+   htp.p('</tr>');
+
+   htp.p('<tr>');
+   htp.p('<th>Admission Fees</th>');
+   htp.p('<td>' || v_admission_fees || '</td>');
+   htp.p('</tr>');
+   htp.p('</table>');
+   
+   htp.p('</body>');
+   htp.p('</html>');
+END;

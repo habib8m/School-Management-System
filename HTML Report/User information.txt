@@ -1,0 +1,51 @@
+
+DECLARE
+   CURSOR user_info_cursor IS
+      SELECT
+         U.USER_NAME,
+         NVL(E.FIRST_NAME, 'NULL') || ' ' || E.LAST_NAME AS Employee_name,
+		 U.STATUS
+      FROM
+         emp_users U
+         LEFT JOIN employees E ON E.employee_id = U.employee_id;
+
+   v_user_info_record user_info_cursor%ROWTYPE;
+BEGIN
+   htp.p('<html>');
+   htp.p('<head>');
+   htp.p('<style>');
+   htp.p('body { font-family: Arial, sans-serif; background-color: #f2f2f2; }');
+   htp.p('h1, h5, h3 { color: #333; text-align: center; margin: 0; }'); 
+   htp.p('table { width: 80%; margin: 20px auto; border-collapse: collapse; }');
+   htp.p('th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }');
+   htp.p('th { background-color: #4CAF50; color: white; }');
+   htp.p('footer { text-align: center; margin-top: 20px; }');
+   htp.p('</style>');
+   htp.p('</head>');
+
+   htp.p('<body>');
+   htp.p('<h1>User Information</h1>');
+   htp.p('<h3>Ideal School and College</h3>');
+   htp.p('<h5>R.K Mission Road Dhaka<br>+8801636987895</h5>');
+   htp.p('<table>');
+   htp.p('<tr>');
+   htp.p('<th>User Name</th>');
+   htp.p('<th>Employee Name</th>');
+   htp.p('<th>Status</th>');
+   htp.p('</tr>');
+
+   FOR v_user_info_record IN user_info_cursor LOOP
+      htp.p('<tr>');
+      htp.p('<td>' || v_user_info_record.USER_NAME || '</td>');
+      htp.p('<td>' || v_user_info_record.Employee_name || '</td>');
+	  htp.p('<td>' || v_user_info_record.status || '</td>');
+      htp.p('</tr>');
+   END LOOP;
+
+   htp.p('</table>');
+   htp.p('<footer>'); -- Added footer section
+   htp.p('<p>Page 1 | ' || TO_CHAR(SYSDATE, 'DD-MON-YYYY') || '</p>');
+   htp.p('</footer>');
+   htp.p('</body>');
+   htp.p('</html>');
+END;

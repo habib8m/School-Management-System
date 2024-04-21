@@ -1,0 +1,34 @@
+
+--Class wise section--
+
+SELECT distinct s.SECTION_NAME d, s.SECTION_ID r
+FROM  SECTIONS S, ADMISSION A, CLASS C
+where A.SECTION_ID = S.SECTION_ID
+and A.CLASS_ID = C.CLASS_ID
+and C.CLASS_ID = :P56_CLASS_ID
+
+
+--Search student attendance and colour present and absent--
+
+SELECT
+	D.DETAIL_AT_ID,
+    D.STUDENT_ID,
+    S.FIRST_NAME || ' ' || S.LAST_NAME AS Student_name,
+    CASE
+        WHEN D.STATUS = 'P' THEN 'success'
+        WHEN D.STATUS = 'A' THEN 'warning'
+    END AS Status_COLOR,
+	CASE
+        WHEN D.STATUS = 'P' THEN 'Present'
+        WHEN D.STATUS = 'A' THEN 'Absent'
+    END AS Status,
+    D.DESCRIPTION
+FROM
+    STU_AT_MASTER M
+    JOIN STU_AT_DETAIL D ON M.MASTER_AT_ID = D.MASTER_AT_ID
+    JOIN STUDENTS S ON S.STUDENT_ID = D.STUDENT_ID
+WHERE
+    M.CLASS_ID = NVL(:P56_CLASS_ID, M.CLASS_ID)
+    AND M.SECTION_ID = NVL(:P56_SECTION_ID, M.SECTION_ID)
+	AND TO_DATE(M.ATTENDANCE_DATE) = NVL(TO_DATE(:P56_ATTENDANCE_DATE, 'DD-MM-YYYY'), TO_DATE(M.ATTENDANCE_DATE))
+
